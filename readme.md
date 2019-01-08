@@ -7,7 +7,7 @@ This package is used to consume OAuth2 API´s from Laravel
 Run the following command from you terminal:
 
  ```bash
- composer require "douglasresendemaciel/OAuth2Client"
+ composer require "douglasresendemaciel/oauth2-client"
  ```
 
 or add this to require section in your composer.json file:
