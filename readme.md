@@ -37,21 +37,21 @@ php artisan vendor:publish
 ## Usage
 
 ``` php
-$client = new \DouglasResende\OAuth2\OAuth2Client();
+$oauth2Client = new \DouglasResende\OAuth2Client\OAuth2Client();
 
-# METHODS TO GET TOKEN // // https://laravel.com/docs/5.7/passport
+# METHODS TO GET TOKEN // https://laravel.com/docs/5.7/passport
 
 // authorization_code
-$oaclient = $restClient->withOAuthTokenTypeAuthorizationCode('client-id', 'client-secret', 'redirect-url', 'code');
+$oauth2 = $oauth2Client->withOAuthTokenTypeAuthorizationCode('client-id', 'client-secret', 'redirect-url', 'code');
 
 // client_credentials
-$oaclient = $restClient->withOAuthTokenTypeClientCredentials('client-id', 'client-secret','scope');
+$oauth2 = $oauth2Client->withOAuthTokenTypeClientCredentials('client-id', 'client-secret','scope');
 
 // password
-$oaclient = $restClient->withOAuthTokenTypePassword('client-id', 'client-secret', 'username', 'password', 'scope');
+$oauth2 = $oauth2Client->withOAuthTokenTypePassword('client-id', 'client-secret', 'username', 'password', 'scope');
 
 // GET RESPONSE
-$response = $restClient->get("user")->getResponseAsArray();
+$response = $oauth2Client->get("user")->getResponseAsArray();
 
 ```
 
