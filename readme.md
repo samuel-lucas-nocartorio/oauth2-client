@@ -24,7 +24,7 @@ Open up config/app.php and add the following to the providers key.
 ```php
 'providers' => [
 ...
-DouglasResende\OAuth2\OAuth2ClientServiceProvider::class
+DouglasResende\OAuth2Client\OAuth2ClientServiceProvider::class
 ...
 ```
 
