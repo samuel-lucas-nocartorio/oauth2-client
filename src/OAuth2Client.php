@@ -432,7 +432,7 @@ class OAuth2Client
             $data = $this->getResponseAsArray();
 
             if (!isset($data['access_token'])) {
-                throw new RuntimeException('"access_token" is not exists in the response data!');
+                throw new RuntimeException('"access_token" is not set in response!');
             }
             $access_token = $data['access_token'];
             $this->setOAuthToken($grant_type, $access_token, ((int)$data['expires_in'] / 60));
