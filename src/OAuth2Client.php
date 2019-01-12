@@ -111,7 +111,7 @@ class OAuth2Client
         $services = $services[$this->environment];
 
         // check service configs
-        if (!isset($services[$service])) {
+        if (!isset($services[$this->service])) {
             throw new RuntimeException("Host [$service] is not found in environment [{$this->environment}] configuration.");
         }
 
