@@ -110,6 +110,11 @@ class OAuth2Client
 
         $services = $services[$this->environment];
 
+        // check service configs
+        if (!isset($services[$service])) {
+            throw new RuntimeException("Host [$service] is not found in environment [{$this->environment}] configuration.");
+        }
+
         $this->setServiceConfig($services[$this->service]);
 
         $base_uri = $this->getServiceConfig('base_uri');
@@ -414,8 +419,16 @@ class OAuth2Client
             // request access token
             $this->postRequestAccessToken($grant_type, $this->getOAuthGrantRequestData($grant_type, $requestData));
 
+            // handle access token
+            if ($this->getResponse()->getStatusCode() != 200) {
+                throw new RuntimeException('Failed to get access token for grant type [' . $grant_type . ']!');
+            }
+
             $data = $this->getResponseAsArray();
 
+            if (!isset($data['access_token'])) {
+                throw new RuntimeException('"access_token" is not set in response!');
+            }
             $access_token = $data['access_token'];
             $this->setOAuthToken($grant_type, $access_token, ((int)$data['expires_in'] / 60));
         }
@@ -495,6 +508,10 @@ class OAuth2Client
      */
     protected function getOAuthGrantRequestData($grant_type, $request_data)
     {
+        if (!isset($this->oauthGrantRequestData[$grant_type])) {
+            throw new RuntimeException('[' . $grant_type . '] was not found in "oauthGrantRequestData"');
+        }
+
         $data = $this->oauthGrantRequestData[$grant_type];
         return array_merge($request_data, $data);
     }
