@@ -88,11 +88,6 @@ class OAuth2Client
     ];
 
     /**
-     * @var bool|mixed|null
-     */
-    protected $debugMode = false;
-
-    /**
      * @var mixed
      */
     protected $environment;
@@ -105,7 +100,6 @@ class OAuth2Client
     {
         $this->environment = env('APP_ENV');
         $this->sharedConfigs = $this->getConfig('shared_configs');
-        $this->debugMode = $this->getConfig('debug_mode');
         $services = $this->getConfig('services');
         $this->service = $service;
 
@@ -424,16 +418,8 @@ class OAuth2Client
             // request access token
             $this->postRequestAccessToken($grant_type, $this->getOAuthGrantRequestData($grant_type, $requestData));
 
-            // handle access token
-            if ($this->getResponse()->getStatusCode() != 200) {
-                throw new RuntimeException('Failed to get access token for grant type [' . $grant_type . ']!');
-            }
-
             $data = $this->getResponseAsArray();
-
-            if (!isset($data['access_token'])) {
-                throw new RuntimeException('"access_token" is not set in response!');
-            }
+            
             $access_token = $data['access_token'];
             $this->setOAuthToken($grant_type, $access_token, ((int)$data['expires_in'] / 60));
         }
@@ -448,11 +434,6 @@ class OAuth2Client
      */
     private function setOAuthToken($type, $access_token, $minutes)
     {
-        if ($this->debugMode) {
-            echo "SET OAuthToken[$type]: $access_token\n\n";
-            echo "OAuthToken Expires in: $minutes minutes\n\n";
-        }
-
         if (empty($access_token)) {
             unset($this->oauthTokens[$type]);
         } else {
@@ -563,16 +544,6 @@ class OAuth2Client
             case 401:
                 Cache::forget($this->getOauthTokensCacheKey());
         }
-
-        if ($statusCode >= 300 && $this->debugMode) {
-            echo "\nResponse STATUS CODE is $statusCode:\n";
-            $responseData = $this->getResponseAsArray();
-            if ($responseData) {
-                $this->printData($responseData);
-            } else {
-                $this->printData($this->getResponse());
-            }
-        }
     }
 
     /**
@@ -582,19 +553,5 @@ class OAuth2Client
     {
         $this->guzzleResponse = $response;
         $this->setResponse(new Response($response->getBody(), $response->getStatusCode(), $response->getHeaders()));
-    }
-
-    /**
-     * @param $string
-     */
-    protected function printData($data)
-    {
-        if ($this->debugMode) {
-            if (is_array($data)) {
-                print_r($data);
-                echo "<br><br>\n\n";
-            } else
-                echo $data . "<br><br>\n\n";
-        }
     }
 }
