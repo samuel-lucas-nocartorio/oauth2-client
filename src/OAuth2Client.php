@@ -110,8 +110,6 @@ class OAuth2Client
 
         $services = $services[$this->environment];
 
-        $this->printData("OACLIENT: " . $this->service . ", ENVIRONMENT: " . $this->environment);
-
         $this->setServiceConfig($services[$this->service]);
 
         $base_uri = $this->getServiceConfig('base_uri');
@@ -120,7 +118,6 @@ class OAuth2Client
         if (!ends_with($base_uri, '/')) {
             $base_uri .= '/';
         }
-        $this->printData("REST CLIENT BASE URI: " . $base_uri);
         $this->client = new Client(array_merge($guzzle_client_config, ['base_uri' => $base_uri, 'exceptions' => false]));
     }
 
@@ -217,7 +214,6 @@ class OAuth2Client
     {
         $options = $this->configureOptions($options);
         $uri = $api ? $this->getServiceConfig('api_url') . $uri : $uri;
-        $this->printData($options);
         $response = $this->client->get($uri, array_merge($options, ['query' => $query,]));
         $this->setGuzzleResponse($response);
         return $this;
@@ -419,7 +415,7 @@ class OAuth2Client
             $this->postRequestAccessToken($grant_type, $this->getOAuthGrantRequestData($grant_type, $requestData));
 
             $data = $this->getResponseAsArray();
-            
+
             $access_token = $data['access_token'];
             $this->setOAuthToken($grant_type, $access_token, ((int)$data['expires_in'] / 60));
         }
