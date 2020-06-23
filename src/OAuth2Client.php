@@ -5,6 +5,7 @@ namespace DouglasResende\OAuth2Client;
 use GuzzleHttp\Client;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
@@ -120,7 +121,7 @@ class OAuth2Client
         $base_uri = $this->getServiceConfig('base_uri');
 
         $guzzle_client_config = $this->getConfig('guzzle_client_config', []);
-        if (!ends_with($base_uri, '/')) {
+        if (!Str::endsWith($base_uri, '/')) {
             $base_uri .= '/';
         }
         $this->client = new Client(array_merge($guzzle_client_config, ['base_uri' => $base_uri, 'exceptions' => false]));
@@ -132,7 +133,7 @@ class OAuth2Client
      * @param $username
      * @param $password
      * @param string $scope
-     * @return OAuth2Client
+     * @return OAuthClient
      */
     public function withOAuthTokenTypePassword($clientId, $clientSecret, $username, $password, $scope = '')
     {
@@ -152,7 +153,7 @@ class OAuth2Client
      * @param $clientId
      * @param $clientSecret
      * @param string $scope
-     * @return OAuth2Client
+     * @return OAuthClient
      */
     public function withOAuthTokenTypeClientCredentials($clientId, $clientSecret, $scope = '')
     {
@@ -171,7 +172,7 @@ class OAuth2Client
      * @param $clientSecret
      * @param $redirectUri
      * @param $code
-     * @return OAuth2Client
+     * @return OAuthClient
      */
     public function withOAuthTokenTypeAuthorizationCode($clientId, $clientSecret, $redirectUri, $code)
     {
@@ -520,7 +521,7 @@ class OAuth2Client
     /**
      * @param $grant_type
      * @param $data
-     * @return OAuth2Client
+     * @return OAuthClient
      */
     protected function postRequestAccessToken($grant_type, $data)
     {
