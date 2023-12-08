@@ -33,7 +33,12 @@ class OAuth2Client
     /**
      * @var string
      */
-    protected $getOauthTokensCacheKey = 'oauth2-client.oauth_tokens';
+    protected $cacheKeyPrefix = 'oauth2-client';
+
+    /**
+     * @var string
+     */
+    protected $cacheKey = 'oauth_tokens';
 
     /**
      * @var
@@ -60,14 +65,17 @@ class OAuth2Client
      *
      */
     const GRANT_TYPE_CLIENT_CREDENTIALS = 'client_credentials';
+
     /**
      *
      */
     const GRANT_TYPE_AUTHORIZATION_CODE = 'authorization_code';
+
     /**
      *
      */
     const GRANT_TYPE_PASSWORD = 'password';
+
     /**
      *
      */
@@ -125,6 +133,30 @@ class OAuth2Client
             $base_uri .= '/';
         }
         $this->client = new Client(array_merge($guzzle_client_config, ['base_uri' => $base_uri, 'exceptions' => false]));
+    }
+
+    public function getCacheKeyPrefix()
+    {
+        return $this->cacheKeyPrefix;
+    }
+
+    public function setCacheKeyPrefix($cacheKeyPrefix)
+    {
+        $this->cacheKeyPrefix = $cacheKeyPrefix;
+
+        return $this;
+    }
+
+    public function getCacheKey()
+    {
+        return $this->cacheKey;
+    }
+
+    public function setCacheKey($cacheKey)
+    {
+        $this->cacheKey = $cacheKey;
+
+        return $this;
     }
 
     /**
@@ -494,12 +526,13 @@ class OAuth2Client
      */
     private function getOauthTokensCacheKey()
     {
-        $user_hash = '';
-        if (!empty($this->oauth_user_credentials)) {
-            $user_hash = "." . sha1(serialize($this->oauth_user_credentials));
-        }
-        $cache_key = $this->getOauthTokensCacheKey . '.' . $this->service . '.' . $this->environment . $user_hash;
-        return $cache_key;
+        $cacheKey = [];
+        $cacheKey[] = $this->cacheKeyPrefix;
+        $cacheKey[] = $this->cacheKey;
+        $cacheKey[] = $this->service;
+        $cacheKey[] = $this->environment;
+
+        return implode('.', $cacheKey);
     }
 
     /**
