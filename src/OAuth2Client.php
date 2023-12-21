@@ -132,7 +132,7 @@ class OAuth2Client
         if (!Str::endsWith($base_uri, '/')) {
             $base_uri .= '/';
         }
-        $this->client = new Client(array_merge($guzzle_client_config, ['base_uri' => $base_uri, 'exceptions' => false]));
+        $this->client = new Client(array_merge($guzzle_client_config, ['base_uri' => $base_uri, 'http_errors' => false]));
     }
 
     public function getCacheKeyPrefix()
