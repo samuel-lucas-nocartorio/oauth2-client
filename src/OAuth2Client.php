@@ -105,10 +105,15 @@ class OAuth2Client
      * OAuth2Client constructor.
      * @param null $service
      */
-    public function __construct($service = null)
+    public function __construct($service = null, $configs = [])
     {
         $this->environment = env('APP_ENV');
         $this->sharedConfigs = $this->getConfig('shared_configs');
+
+        if(!empty($configs)) {
+            $this->sharedConfigs = array_merge($this->sharedConfigs, $configs);
+        }
+
         $services = $this->getConfig('services');
         $this->service = $service;
 
@@ -165,7 +170,7 @@ class OAuth2Client
      * @param $username
      * @param $password
      * @param string $scope
-     * @return OAuthClient
+     * @return OAuth2Client
      */
     public function withOAuthTokenTypePassword($clientId, $clientSecret, $username, $password, $scope = '')
     {
@@ -185,7 +190,7 @@ class OAuth2Client
      * @param $clientId
      * @param $clientSecret
      * @param string $scope
-     * @return OAuthClient
+     * @return OAuth2Client
      */
     public function withOAuthTokenTypeClientCredentials($clientId, $clientSecret, $scope = '')
     {
@@ -204,7 +209,7 @@ class OAuth2Client
      * @param $clientSecret
      * @param $redirectUri
      * @param $code
-     * @return OAuthClient
+     * @return OAuth2Client
      */
     public function withOAuthTokenTypeAuthorizationCode($clientId, $clientSecret, $redirectUri, $code)
     {
