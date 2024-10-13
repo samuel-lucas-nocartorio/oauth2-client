@@ -397,7 +397,10 @@ class OAuth2Client
      */
     private function getServiceConfig($key)
     {
-        return $this->configs[$key];
+        if(isset($this->configs[$key])) {
+            return $this->configs[$key];
+        }
+        return null;
     }
 
     /**
@@ -506,6 +509,16 @@ class OAuth2Client
     private function configureOptions($options)
     {
         $headers = $this->getServiceConfig('headers');
+
+        $cert = $this->getServiceConfig('cert');
+        if(!empty($cert)){
+            $options['cert'] = $cert;
+        }
+
+        $sslKey = $this->getServiceConfig('ssl_key');
+        if(!empty($sslKey)){
+            $options['ssl_key'] = $sslKey;
+        }
 
         // add client ip to header
         $request = request();
