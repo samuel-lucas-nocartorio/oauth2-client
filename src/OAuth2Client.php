@@ -520,6 +520,9 @@ class OAuth2Client
             $options['ssl_key'] = $sslKey;
         }
 
+        $verify = $this->getServiceConfig('verify');
+        $options['verify'] = $verify;
+
         // add client ip to header
         $request = request();
         $clientIp = $request->getClientIp();
