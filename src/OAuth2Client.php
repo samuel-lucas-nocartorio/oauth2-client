@@ -1,8 +1,11 @@
+
 <?php
 
 namespace DouglasResende\OAuth2Client;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\RequestOptions;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -132,11 +135,9 @@ class OAuth2Client
         $this->setServiceConfig($services[$this->service]);
 
         $base_uri = $this->getServiceConfig('base_uri');
+        $base_uri = $this->normalizeUri($base_uri);
 
         $guzzle_client_config = $this->getConfig('guzzle_client_config', []);
-        if (!Str::endsWith($base_uri, '/')) {
-            $base_uri .= '/';
-        }
         $this->client = new Client(array_merge($guzzle_client_config, ['base_uri' => $base_uri, 'http_errors' => false]));
     }
 
@@ -318,6 +319,15 @@ class OAuth2Client
         return $this;
     }
 
+    public function postJson($uri, array $data = [], array $options = [], $api = true)
+    {
+        $options = $this->configureOptions($options);
+        $uri = $api ? $this->getServiceConfig('api_url') . $uri : $uri;
+        $response = $this->client->post($uri, array_merge($options, [RequestOptions::JSON => $data,]));
+        $this->setGuzzleResponse($response);
+        return $this;
+    }
+
     /**
      * @param string $uri
      * @param array $data
@@ -477,6 +487,18 @@ class OAuth2Client
         return $this->oauthTokens[$grant_type];
     }
 
+    protected function normalizeUri(?string $uri) {
+        if (!$uri) {
+            return $uri;
+        }
+
+        if (!Str::endsWith($uri, '/')) {
+            $uri .= '/';
+        }
+
+        return $uri;
+    }
+
     /**
      * @param $type
      * @param $access_token
@@ -575,12 +597,23 @@ class OAuth2Client
     /**
      * @param $grant_type
      * @param $data
-     * @return OAuthClient
+     * @return OAuth2Client
      */
     protected function postRequestAccessToken($grant_type, $data)
     {
+        $authUri = $this->getAuthUri();
         $url = $this->getServiceConfig('oauth2_access_token_url');
+
+        if ($authUri) {
+            $url = $authUri . $url;
+        }
+
         return $this->post($url, array_merge($data, ['grant_type' => $grant_type,]), [], false);
+    }
+
+    protected function getAuthUri() {
+        $authUri = $this->getServiceConfig('auth_uri');
+        return $this->normalizeUri($authUri);
     }
 
     /**
