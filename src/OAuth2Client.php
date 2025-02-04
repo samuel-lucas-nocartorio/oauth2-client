@@ -1,4 +1,3 @@
-
 <?php
 
 namespace DouglasResende\OAuth2Client;
