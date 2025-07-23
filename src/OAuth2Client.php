@@ -57,10 +57,9 @@ class OAuth2Client
      */
     protected $client;
 
-    /**
-     * @var array
-     */
-    protected $oauthTokens = [];
+    protected array $oauthTokens = [];
+
+    private bool $useCache = true;
 
     // Grant Types
     /**
@@ -243,6 +242,18 @@ class OAuth2Client
     public function withoutOAuthToken()
     {
         $this->oauthTokenGrantType = null;
+        return $this;
+    }
+
+    public function withCache(): OAuth2Client
+    {
+        $this->useCache = true;
+        return $this;
+    }
+
+    public function withoutCache(): OAuth2Client
+    {
+        $this->useCache = false;
         return $this;
     }
 
@@ -463,7 +474,9 @@ class OAuth2Client
      */
     private function getOAuthToken(string $grant_type, array $requestData = [])
     {
-        $this->oauthTokens = Cache::get($this->getOauthTokensCacheKey(), []);
+        if ($this->useCache) {
+            $this->oauthTokens = Cache::get($this->getOauthTokensCacheKey(), []);
+        }
 
         if (!isset($this->oauthTokens[$grant_type])) {
             // request access token
@@ -511,7 +524,9 @@ class OAuth2Client
             $this->oauthTokens[$type] = $access_token;
         }
 
-        Cache::put($this->getOauthTokensCacheKey(), $this->oauthTokens, $minutes);
+        if ($this->useCache) {
+            Cache::put($this->getOauthTokensCacheKey(), $this->oauthTokens, $minutes);
+        }
     }
 
     /**
